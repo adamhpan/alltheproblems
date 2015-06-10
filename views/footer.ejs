@@ -1,0 +1,51 @@
+<footer>
+
+</footer>
+
+<script src="<%= siteurl%>/bower_components/jquery/dist/jquery.js"></script>
+<script src="<%= siteurl%>/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="<%= siteurl%>/bower_components/masonry/dist/masonry.pkgd.min.js"></script>
+<script src="<%= siteurl%>/bower_components/bootstrap.growl/dist/bootstrap-notify.min.js"></script>
+<script src="<%= siteurl%>/bower_components/jquery-validation/dist/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(document).on( "click", ".ihover", function(){
+            if($(this).hasClass("voted") || $(this).hasClass("share")){
+                return;
+            }
+
+            var postid = $(this).closest(".grid-item").attr("data-postid");
+            var votetype = $(this).attr("data-vote");
+
+            $(this).addClass("voted");
+            var newvote = parseInt($(this).children("span").text())+1;
+            $(this).children("span").text(newvote);
+            
+            var data = {postid: postid, votetype: votetype};
+            $.ajax({
+                url:"<%= siteurl%>/vote",
+                method: 'POST',
+                data: data
+            });
+        });
+        
+        $(function() {
+            var $sidebar   = $("#sidebar"), 
+                $window    = $(window),
+                offset     = $sidebar.offset(),
+                topPadding = 15;
+
+            $window.scroll(function() {
+                if ($window.scrollTop() > offset.top && $(document).width() > 976) {
+                    $sidebar.stop().animate({
+                        marginTop: $window.scrollTop() - offset.top + topPadding
+                    });
+                } else {
+                    $sidebar.stop().animate({
+                        marginTop: 0
+                    });
+                }
+            });
+        });
+    });
+</script>

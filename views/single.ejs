@@ -1,0 +1,48 @@
+<% include ./head %>
+<% include ./header %>
+
+<%
+function formatDate(dateinput){
+	var curdate = new Date(dateinput);
+	var mS = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+	var newdate = curdate.getDate()+" "+mS[(curdate.getMonth()+1)]+" "+curdate.getFullYear();
+	return newdate;
+}
+%>
+
+<div class="container">
+	<div class="grid-item col-lg-12 col-md-12 col-sm-12 col-xs-12" data-postid="<%= post.id%>">
+		<div class="grid-gutter" style="margin:2em 0;">
+			<h3><%= post.post_title%></h3>
+			<div class="col-md-3 pull-left" id="posttag">
+			</div>
+			<div class="postdate pull-right">
+				<i class="fa fa-calendar pull-left" style="margin:2px 10px"></i><%= formatDate(post.post_date) %>
+			</div>
+			<div class="clearfix"></div>
+			<p style="font-size:2em;">
+				<%= post.post_content %>
+			</p>
+			<div class="clearfix"></div><hr/>
+			<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="relate"><i class="fa fa-heart-o fa-lg"></i><span><%= post.post_voterelate %></span></div>
+			<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="love"><i class="fa fa-smile-o fa-lg"></i><span><%= post.post_votelove %></span></div>
+			<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="hate"><i class="fa fa-frown-o fa-lg"></i><span><%= post.post_votehate %></span></div>
+			<div class="col-md-3 col-sm-3 col-xs-3 ihover share"><i class="fa fa-share-square-o fa-lg"></i></div>
+			<div class="clear"></div>
+		</div>
+	</div>
+
+	<div id="disqus_thread"></div>
+	<script type="text/javascript">
+	    var disqus_shortname = 'alltheproblems';
+	    
+	    (function() {
+	        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	    })();
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</div>
+
+<% include ./footer %>	

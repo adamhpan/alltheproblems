@@ -1,0 +1,72 @@
+var express = require('express');
+var _ = require('underscore');
+var bodyParser = require('body-parser');
+var config = require('./lib/config');
+var app =  express();
+
+app.set('view engine', 'ejs');
+app.set('view options', {layout:false});
+app.use('/public', express.static('public'));
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
+
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+// using the mysql module to connect to the db
+var mysql = require('mysql');
+var config = require('./lib/config');
+
+// creating initial connection pool
+var pool = mysql.createPool({
+	// maximum new connections at one time
+	connectionLimit: 100,
+	host: 'localhost',
+	user: 'root',
+	password: '',
+	database: 'alltheproblems',
+	debug: false
+});
+
+// updating a post's votes
+app.post("/vote", function (req,res) {
+	pool.getConnection(function(err, connection){
+		if(err){
+			connection.release();
+			res.status(500).send('Vote query connection sucks.');
+		}
+		var query = "UPDATE post SET post_vote"+req.body.votetype+" = post_vote"+req.body.votetype+" + 1 WHERE id ="+req.body.postid;
+		connection.query(query, function(err, rows){
+			if(!err){
+				res.json({status: "success"});
+			}
+		});
+
+	});
+});
+
+// index load - starting the app
+app.get("/", function (req,res) {
+	function get_posts(){
+		pool.getConnection(function(err, connection){
+			if(err){
+				connection.release();
+				res.status(500).send('Initial get posts connection error');
+				return;
+			}
+			connection.query("SELECT * FROM post ORDER BY post_date",function(err, rows){
+				connection.release();
+				if(!err){
+					console.log(rows);
+					res.render('index', {title: "All The Problems", posts: rows});
+				}
+			});
+		});
+	}
+
+	get_posts(function(err, result){
+		if(err){ return; }
+		finishRequest(result);
+	});
+});
+
+var server = app.listen(3000);

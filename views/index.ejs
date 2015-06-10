@@ -1,0 +1,153 @@
+<%
+function formatDate(dateinput){
+	var curdate = new Date(dateinput);
+	var mS = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+	var newdate = curdate.getDate()+" "+mS[(curdate.getMonth()+1)]+" "+curdate.getFullYear();
+	return newdate;
+}
+%>
+<% include ./head %>
+<% include ./header %>
+	<div id="hero">
+		<div class="container">
+			<blockquote class="blockquote-reverse">
+				<h1><%= quote.quote%></h1>
+				<footer><%= quote.quoter%></footer>
+			</blockquote>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class=" col-md-9" style="padding:0">
+				<div id="msnry-container" class="posts">
+					<% 	
+						for(var i = 0; i < posts.length; i++){ 
+							var post = posts[i];
+							curdate = formatDate(post.post_date);
+							%>
+						<div class="grid-item col-lg-4 col-md-6 col-sm-12 col-xs-12" data-postid="<%= post.id%>">
+							<div class="grid-gutter">
+								<h3><%= post.post_title%></h3>
+								<div class="col-md-3 pull-left" id="posttag">
+								</div>
+								<div class="postdate pull-right">
+									<i class="fa fa-calendar pull-left" style="margin:2px 10px"></i><%= curdate %>
+								</div>
+								<div class="clearfix"></div>
+								<p>
+									<%= post.post_content %>
+								</p>
+								<a class="readmore pull-right btn btn-danger" href="<%= siteurl%>/s/<%= post.id%>">
+									Read More
+								</a><div class="clearfix"></div><hr/>
+								<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="relate"><i class="fa fa-heart-o fa-lg"></i><span><%= post.post_voterelate %></span></div>
+								<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="love"><i class="fa fa-smile-o fa-lg"></i><span><%= post.post_votelove %></span></div>
+								<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="hate"><i class="fa fa-frown-o fa-lg"></i><span><%= post.post_votehate %></span></div>
+								<div class="col-md-3 col-sm-3 col-xs-3 ihover share"><i class="fa fa-share-square-o fa-lg"></i></div>
+								<div class="clear"></div>
+							</div>
+						</div>
+					<% } %>
+				</div>
+				<div class="col-md-12">
+					<button id="loadmore" data-value="15" class="btn btn-default col-md-12 col-sm-12 form-control">Load More</button>
+					<i id="ldr_posts" class="fa fa-circle-o-notch fa-spin col-md-12 col-sm-12" style="display:none"></i>
+					<div class="clear"></div><br>
+				</div>
+			</div>
+			<div id="sidebar" role="tabpanel" class="col-md-3">
+				<ul class="nav nav-tabs" id="sidetabs" role="tablist">
+					<li class="col-md-6 active">
+						<a href="#recent" aria-controls="recent" data-toggle="tab">Recent Posts</a>
+					</li>
+					<li class="col-md-6">
+						<a href="#popular" aria-controls="popular" data-toggle="tab">Popular Posts</a>
+					</li>
+				</ul>
+
+				<div class="tab-content">
+					<div role="tabpanel" class="tab-pane active" id="recent">
+						<% for( i = 0; i < recent.length; i++){%>
+						<div class="col-md-12 bottom-divider">
+							<h5><%= recent[i].post_title || 'I\'m too lazy to put a title' %></h5>
+							<div style="opacity:0.7">
+								<i class="fa fa-calendar pull-left" style="margin:2px 10px 0 0"></i><%= formatDate(recent[i].post_date); %>
+							</div>
+							<div class="clear" style="margin-bottom:10px"></div>
+						</div>
+						<% } %>
+					</div>
+					<div role="tabpanel" class="tab-pane" id="popular">
+						<% for( i = 0; i < popular.length; i++){%>
+						<div class="col-md-12 bottom-divider grid-item" data-postid="<%= popular[i].id%>" style="min-width:initial">
+							<h5><%= popular[i].post_content || 'Still lazy'%></h5>
+							<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="relate"><i class="fa fa-heart-o fa-lg"></i><span><%= popular[i].post_voterelate %></span></div>
+							<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="love"><i class="fa fa-smile-o fa-lg"></i><span><%= popular[i].post_votelove %></span></div>
+							<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="hate"><i class="fa fa-frown-o fa-lg"></i><span><%= popular[i].post_votehate %></span></div>
+							<div class="col-md-3 col-sm-3 col-xs-3 ihover share"><i class="fa fa-share-square-o fa-lg"></i></div>
+							<div class="clear" style="padding:6px"></div>
+						</div>
+						<% } %>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<% include ./footer %>	
+   
+    <script type="text/javascript">
+    	$('#msnry-container').masonry({
+    		itemSelector: '.grid-item',
+    	});
+
+    	$(document).ready(function(){
+    		$("#loadmore").on("click", function(){
+    			var $curbtn = $(this);
+    			$curbtn.hide();
+    			$("#ldr_posts").show();
+    			$.ajax({
+    				url: '<%= siteurl%>/loadmore',
+    				method: 'GET',
+    				data: {
+    					currentrow: $(this).attr('data-value')
+    				},
+    				success: function(res){
+    					if(res.status == "success"){
+    						for( i = 0; i < res.posts.length; i++){
+    							var $tempblock = $( res.posts[i] );
+    							$('#msnry-container').append( $tempblock ).masonry('appended', $tempblock);
+    						}
+			    			$curbtn.attr('data-value', parseInt($curbtn.attr('data-value')) + 15);
+			    			$curbtn.show();
+			    			$("#ldr_posts").hide();
+    					}else{
+    						$curbtn.show();
+			    			$("#ldr_posts").hide();
+    						$.notify({
+								message: 'That\'s all folks, you\'ve reached the end'
+							},{
+								type: 'info',
+								delay: 2000,
+								placement: {
+									from:'top',
+									align:'center'
+								},
+								animate: {
+									enter: 'animated fadeInDown',
+									exit: 'animated fadeOutUp'
+								}
+							});	
+    					}
+    				}
+    			})
+    		});
+    	});
+
+    	// tab script
+    	$('#sidetabs a[href="#popular"]').tab('show');
+    	$('#sidetabs a[href="#recent"]').tab('show');
+    </script>
+  </body>
+</html>
