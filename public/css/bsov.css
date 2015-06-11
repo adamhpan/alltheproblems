@@ -1,0 +1,19 @@
+@media (max-width: 768px) {
+	#bannerquote{
+		margin: 5em 0;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+		#bannerquote{
+		margin: 7em 0;
+	}
+}
+
+@media (min-width: 992px) and (max-width: 1200px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}

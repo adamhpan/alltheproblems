@@ -16,10 +16,10 @@
 
 			<!-- Untoggled header information -->
 			<div class="collapse navbar-collapse" id="navbar-collapse">
-				<form class="navbar-form navbar-left" role="search">
+				<form action="<%= siteurl%>/search" method="get" class="navbar-form navbar-left" role="search">
 					<div class="form-group">
 						<i class="fa fa-search"></i>
-						<input type="text" id="main_search" class="form-control" placeholder="Search">
+						<input type="text" id="main_search" class="form-control" placeholder="Search" name="q">
 					</div>
 				</form>
 				<ul class="nav navbar-nav navbar-right">

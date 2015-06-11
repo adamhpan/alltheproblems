@@ -94,51 +94,6 @@ function getQuote(){
 	return deferred.promise;
 }
 
-function formatDate(dateinput){
-	var curdate = new Date(dateinput);
-	var mS = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
-	var newdate = curdate.getDate()+" "+mS[(curdate.getMonth()+1)]+" "+curdate.getFullYear();
-	return newdate;
-}
-
-// index load - starting the app
-app.get("/", function (req,res) {
-	Q.all([getPostByDate(), getRecentPost(), getPopularPost(), getQuote()]).then(function(result){
-		posts = result[0];
-		recent = result[1];
-		popular = result[2];
-		quote = result[3][0];
-		var data = {title: "All The Problems", siteurl:siteurl,
-		posts:posts, recent:recent, popular:popular, quote:quote};
-		res.render('index', data);
-	});
-});
-
-app.get("/contact-us", function (req,res){
-	res.render('contact-us', {siteurl:siteurl});
-});
-
-app.post("/contact-us", function (req,res){
-	pool.getConnection(function(err, connection){
-		var data = {status: "fail"};
-		if(err){
-			connection.release();
-			res.status(500).send("We just suck at coding, sorry.");
-		}
-		var info = req.body;
-		var query = 'INSERT contactus (contactus_email, contactus_reason, contactus_content)' +
-		'VALUES ("' + info.email + '","' + info.reason + '","' + info.content + '");';
-		
-		connection.query(query, function(err, result){
-			if(!err){
-				connection.release();
-				data.status = "success";
-			}
-			res.json(data); 
-		});
-	});
-});
-
 function generatePost(rawpost){
 	var title = rawpost.post_title || "";
 	var curdate = formatDate(rawpost.post_date);
@@ -168,10 +123,37 @@ function generatePost(rawpost){
 	return html;
 }
 
+function formatDate(dateinput){
+	var curdate = new Date(dateinput);
+	var mS = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+	var newdate = curdate.getDate()+" "+mS[(curdate.getMonth()+1)]+" "+curdate.getFullYear();
+	return newdate;
+}
+
+// index load - starting the app
+app.get("/", function (req,res) {
+	Q.all([getPostByDate(), getRecentPost(), getPopularPost(), getQuote()]).then(function(result){
+		posts = result[0];
+		recent = result[1];
+		popular = result[2];
+		quote = result[3][0];
+		quote.query = false;
+		var data = {title: "All The Problems", siteurl:siteurl,
+		posts:posts, recent:recent, popular:popular, quote:quote};
+		res.render('index', data);
+	});
+});
+
+app.get("/contact-us", function (req,res){
+	res.render('contact-us', {siteurl:siteurl});
+});
+
+
 app.get("/s/:postid", function (req, res){
 	var querystring = "SELECT * FROM post WHERE id = " + req.params.postid;
 	getPostByDate(querystring).then(function (row){
-		res.render('single', {siteurl: siteurl, post: row[0]});
+		var metadata = {url:row[0].post_title, description:row[0].post_content};
+		res.render('single', {siteurl: siteurl, post: row[0], metaset:metadata});
 		return;
 	});
 });
@@ -202,6 +184,45 @@ app.get("/loadmore", function (req,res){
 	});
 });
 
+app.get("/search*", function (req, res){
+	var terms = "";
+	var termarray = req.query.q.split(" ");
+	for( i = 0; i < termarray.length; i++){
+		terms += " +"+termarray[i];
+	}
+
+	pool.getConnection(function (err, connection){
+		if(err){
+			connection.release();
+			return false;
+		}
+		Q.all([getRecentPost(), getPopularPost(), getQuote()]).then(function(result){
+			recent = result[0];
+			popular = result[1];
+			quote = result[2][0];
+			quote.query = false;
+			var querystring = "SELECT * FROM post WHERE MATCH(post_content,post_title, post_tags)"+
+			"AGAINST('" + terms + "' IN BOOLEAN MODE)";
+
+			if(req.query.currentrow > 14){
+				querystring += " LIMIT " + req.query.currentrow + ",15";
+			}
+
+			connection.query(querystring, function (err, rows){
+				if(!err){
+					connection.release();
+					var quotetoquery = {
+						quote: 'We tried our best to find "' + req.query.q + '"',
+						quoter: "The friendly ATP robot",
+						query: req.query.q
+					}
+					res.render('index', {siteurl:siteurl, recent:recent, popular:popular, posts:rows, quote: quotetoquery});
+				}
+			});
+		})
+	})
+});
+
 // updating a post's votes
 app.post("/vote", function (req,res) {
 	pool.getConnection(function(err, connection){
@@ -215,6 +236,27 @@ app.post("/vote", function (req,res) {
 				connection.release();
 				res.json({status: "success"});
 			}
+		});
+	});
+});
+
+app.post("/contact-us", function (req,res){
+	pool.getConnection(function(err, connection){
+		var data = {status: "fail"};
+		if(err){
+			connection.release();
+			res.status(500).send("We just suck at coding, sorry.");
+		}
+		var info = req.body;
+		var query = 'INSERT contactus (contactus_email, contactus_reason, contactus_content)' +
+		'VALUES ("' + info.email + '","' + info.reason + '","' + info.content + '");';
+		
+		connection.query(query, function(err, result){
+			if(!err){
+				connection.release();
+				data.status = "success";
+			}
+			res.json(data); 
 		});
 	});
 });

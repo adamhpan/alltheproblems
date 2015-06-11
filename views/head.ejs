@@ -4,14 +4,25 @@
 			<meta charset="utf-8">
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
 			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<meta name="description" content="A site dedicated to the problems of the first world.">
+			<meta name="keywords" content="first, world, problems, atp, ymd, funny, interesting, quote">
+			<meta name="robots" content="index, follow">
+			<meta property="fb:app_id" content="[304683993067792]" />
+			<meta property="og:site_name" content="<%= siteurl%>">
 			<% if(locals.metaset){ %>
+				<meta property="og:title" content="First World Problems">
+				<meta property="og:url" content="<%= metaset.url %>">
+				<meta property="og:description" content="<%= metaset.description %>">
 			<% } %>
 			<title>All The Problems</title>
 
 			<!-- Bootstrap -->
 			<link href="<%= siteurl%>/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+			<!-- Font Awesome -->
 			<link href="<%= siteurl%>/bower_components/components-font-awesome/css/font-awesome.min.css" rel="stylesheet">
+			<!-- Public -->
 			<link href="<%= siteurl%>/public/css/style.css" rel="stylesheet">
+			<link href="<%= siteurl%>/public/css/bsov.css" rel="stylesheet">
 			<link href="<%= siteurl%>/public/css/animate.css" rel="stylesheet">
 		</head>
   		<body>

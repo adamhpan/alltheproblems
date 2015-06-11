@@ -208,13 +208,18 @@ body{
 #sidebar.affix {
 }
 
-blockquote{
+#bannerquote{
 	color:white;
 	margin: 10em 0;
 	background-color: rgba(20,20,20,0.7); 
 }
 
-blockquote footer{
+#bannerquote footer{
 	color: #CACACA;
 }
 
+.sharebox{
+	display: none;
+	position: absolute; 
+	top: 0;
+}

@@ -10,7 +10,7 @@ function formatDate(dateinput){
 <% include ./header %>
 	<div id="hero">
 		<div class="container">
-			<blockquote class="blockquote-reverse">
+			<blockquote id="bannerquote" class="blockquote-reverse">
 				<h1><%= quote.quote%></h1>
 				<footer><%= quote.quoter%></footer>
 			</blockquote>
@@ -19,22 +19,22 @@ function formatDate(dateinput){
 	<div class="container">
 		<div class="row">
 			<div class=" col-md-9" style="padding:0">
-				<div id="msnry-container" class="posts">
-					<% 	
-						for(var i = 0; i < posts.length; i++){ 
+				<% 	if(posts.length > 0){ %>
+					<div id="msnry-container" class="posts">
+						<% for(var i = 0; i < posts.length; i++){ 
 							var post = posts[i];
 							curdate = formatDate(post.post_date);
 							%>
 						<div class="grid-item col-lg-4 col-md-6 col-sm-12 col-xs-12" data-postid="<%= post.id%>">
 							<div class="grid-gutter">
-								<h3><%= post.post_title%></h3>
+								<h3 data-role="post_title"><%= post.post_title%></h3>
 								<div class="col-md-3 pull-left" id="posttag">
 								</div>
 								<div class="postdate pull-right">
 									<i class="fa fa-calendar pull-left" style="margin:2px 10px"></i><%= curdate %>
 								</div>
 								<div class="clearfix"></div>
-								<p>
+								<p data-role="post_content">
 									<%= post.post_content %>
 								</p>
 								<a class="readmore pull-right btn btn-danger" href="<%= siteurl%>/s/<%= post.id%>">
@@ -43,17 +43,35 @@ function formatDate(dateinput){
 								<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="relate"><i class="fa fa-heart-o fa-lg"></i><span><%= post.post_voterelate %></span></div>
 								<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="love"><i class="fa fa-smile-o fa-lg"></i><span><%= post.post_votelove %></span></div>
 								<div class="col-md-3 col-sm-3 col-xs-3 ihover" data-vote="hate"><i class="fa fa-frown-o fa-lg"></i><span><%= post.post_votehate %></span></div>
-								<div class="col-md-3 col-sm-3 col-xs-3 ihover share"><i class="fa fa-share-square-o fa-lg"></i></div>
+								<div class="col-md-3 col-sm-3 col-xs-3 ihover share text-center">
+									<i class="fa fa-share-square-o fa-lg"></i>
+									<div class="sharebox">
+										<a class="pull-left" href="http://www.facebook.com/sharer.php?u=<%= siteurl%>">
+											<i class="fa fa-facebook-square fa-lg"></i>
+										</a>
+										<a class="pull-left" href="http://www.tumblr.com/share/link?url=<%= siteurl%>&amp;name=<%= post.post_content%>&hashtags=FWP">
+											<i class="fa fa-twitter-square fa-lg"></i>
+										</a>
+									</div>
+								</div>
 								<div class="clear"></div>
 							</div>
 						</div>
 					<% } %>
-				</div>
-				<div class="col-md-12">
-					<button id="loadmore" data-value="15" class="btn btn-default col-md-12 col-sm-12 form-control">Load More</button>
-					<i id="ldr_posts" class="fa fa-circle-o-notch fa-spin col-md-12 col-sm-12" style="display:none"></i>
-					<div class="clear"></div><br>
-				</div>
+					</div>
+					<div class="col-md-12">
+						<button id="loadmore" data-value="15" class="btn btn-default col-md-12 col-sm-12 form-control">Load More</button>
+						<i id="ldr_posts" class="fa fa-circle-o-notch fa-spin col-md-12 col-sm-12" style="display:none"></i>
+						<div class="clear"></div><br>
+					</div>
+				<% }else{ %>
+					<div class="col-md-12 grid-item">
+						<div class="col-md-12 grid-gutter text-center">
+							<h4>No Posts To Display</h4>
+							<div class="clear"></div>
+						</div>
+					</div>
+				<% } %>
 			</div>
 			<div id="sidebar" role="tabpanel" class="col-md-3">
 				<ul class="nav nav-tabs" id="sidetabs" role="tablist">
@@ -98,21 +116,35 @@ function formatDate(dateinput){
 	<% include ./footer %>	
    
     <script type="text/javascript">
+		var forquery = <%= (quote.query)?"true":"false" %>;
     	$('#msnry-container').masonry({
     		itemSelector: '.grid-item',
     	});
 
     	$(document).ready(function(){
+    		$(".share").hover(
+    			function(){
+    				$(this).children(":first").hide();
+    				$(this).children(":last").show();
+    			},function(){
+    				$(this).children(":last").hide();
+    				$(this).children(":first").show();
+    			}
+    		);
     		$("#loadmore").on("click", function(){
+    			var url = '<%= siteurl%>/loadmore';
+    			var data = {currentrow: $(this).attr('data-value')}
+    			if(forquery){
+    				url = '<%= siteurl%>/search';
+    				data.q = '<%= quote.query %>'
+    			}
     			var $curbtn = $(this);
     			$curbtn.hide();
     			$("#ldr_posts").show();
     			$.ajax({
-    				url: '<%= siteurl%>/loadmore',
+    				url: url,
     				method: 'GET',
-    				data: {
-    					currentrow: $(this).attr('data-value')
-    				},
+    				data: data,
     				success: function(res){
     					if(res.status == "success"){
     						for( i = 0; i < res.posts.length; i++){
