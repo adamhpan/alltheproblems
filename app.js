@@ -5,8 +5,9 @@ var config = require('./lib/config');
 var app =  express();
 var Q = require('q');
 var pagination = require('pagination');
+app.set('port', (process.env.PORT || 5000));
 
-var siteurl = "http://localhost:3000";
+var siteurl = "http://localhost:5000";
 
 app.set('view engine', 'ejs');
 app.set('view options', {layout:false});
@@ -261,4 +262,4 @@ app.post("/contact-us", function (req,res){
 	});
 });
 
-var server = app.listen(3000);
+var server = app.listen(app.get('port'));
