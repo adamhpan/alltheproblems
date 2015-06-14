@@ -23,11 +23,12 @@ var config = require('./lib/config');
 var pool = mysql.createPool({
 	// maximum new connections at one time
 	connectionLimit: 100,
-	host: 'localhost',
-	user: 'root',
-	password: '',
-	database: 'alltheproblems',
-	debug: false
+	host: 'us-cdbr-iron-east-02.cleardb.net',
+	user: 'b4813ec7b454d9',
+	password: '2c10c5ac',
+	database: 'heroku_4bd6aca5ce613e5',
+	// port: '5432',
+	debug: true
 });
 
 function getPostByDate(querystring){
