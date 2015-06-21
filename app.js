@@ -6,7 +6,7 @@ var app =  express();
 var Q = require('q');
 var pagination = require('pagination');
 
-var siteurl = "http://localhost:5000";
+var siteurl = "afternoon-springs-1968.herokuapp.com";
 
 app.set('view engine', 'ejs');
 app.set('view options', {layout:false});
@@ -28,7 +28,7 @@ var pool = mysql.createPool({
 	password: '2c10c5ac',
 	database: 'heroku_4bd6aca5ce613e5',
 	// port: '5432',
-	debug: true
+	debug: false
 });
 
 function getPostByDate(querystring){
