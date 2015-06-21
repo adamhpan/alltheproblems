@@ -11,7 +11,7 @@ var siteurl = "http://localhost:5000";
 app.set('view engine', 'ejs');
 app.set('view options', {layout:false});
 app.use('/public', express.static('public'));
-app.use('/bower_components', express.static('bower_components'));
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
