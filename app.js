@@ -6,7 +6,7 @@ var app =  express();
 var Q = require('q');
 var pagination = require('pagination');
 
-var siteurl = "afternoon-springs-1968.herokuapp.com";
+var siteurl = "http://localhost/";
 
 app.set('view engine', 'ejs');
 app.set('view options', {layout:false});
