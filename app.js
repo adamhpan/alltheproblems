@@ -2,9 +2,11 @@ var express = require('express');
 var _ = require('underscore');
 var bodyParser = require('body-parser');
 var config = require('./lib/config');
-var app =  express();
+var cors = require('cors');
 var Q = require('q');
 var pagination = require('pagination');
+
+var app =  express();
 
 var siteurl = "http://afternoon-springs-1968.herokuapp.com";
 // var siteurl = "http://localhost:5000";
@@ -15,6 +17,7 @@ app.use('/public', express.static('public'));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+app.use(cors());
 
 // using the mysql module to connect to the db
 var mysql = require('mysql');
