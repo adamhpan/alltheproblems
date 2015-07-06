@@ -13,7 +13,7 @@ function byDate(querystring){
 	var deferred = Q.defer();
 
 	querystring = typeof querystring !== 'undefined' ? 
-	querystring : "SELECT * FROM post ORDER BY post_date LIMIT 15";
+	querystring : "SELECT * FROM posts ORDER BY post_date LIMIT 15";
 
 	pool.getConnection(function(err, connection){
 		if(err){
@@ -35,7 +35,7 @@ function byDate(querystring){
 exports.byRecent = function (){
 	var deferred = Q.defer();
 
-	querystring = "SELECT * FROM post ORDER BY post_date LIMIT 3";
+	querystring = "SELECT * FROM posts ORDER BY post_date LIMIT 3";
 	byDate(querystring).then(function(recenttab){
 		deferred.resolve(recenttab);
 	});
@@ -46,7 +46,7 @@ exports.byRecent = function (){
 exports.byPopular = function (){
 	var deferred = Q.defer();
 
-	querystring = "SELECT * FROM post ORDER BY post_voterelate DESC LIMIT 3";
+	querystring = "SELECT * FROM posts ORDER BY post_voterelate DESC LIMIT 3";
 	byDate(querystring).then(function(recenttab){
 		deferred.resolve(recenttab);
 	});
