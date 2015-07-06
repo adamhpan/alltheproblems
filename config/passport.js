@@ -2,7 +2,7 @@
 
 // load the strategies
 var LocalStrategy	 = require('passport-local').Strategy;
-var FacebookStrategy = require('passport-facebook').Strategy;
+// var FacebookStrategy = require('passport-facebook').Strategy;
 
 // load database
 var configDB 		= require('./database.js');
@@ -99,19 +99,19 @@ module.exports = function(passport){
 	// =====================================
 	// FACEBOOK SIGNUP =====================
 	// =====================================
-	passport.use(
-		'facebook',
-		new FacebookStrategy({
-		clientID: FACEBOOK_APP_ID,
-		clientSecret: FACEBOOK_APP_SECRET,
-	    callbackURL: siteurl+"/auth/facebook/callback"
-	  },
-	  function(accessToken, refreshToken, profile, done) {
-	    process.nextTick(function () {
-	      return done(null, profile);
-	    });
-	  }
-	));
+	// passport.use(
+	// 	'facebook',
+	// 	new FacebookStrategy({
+	// 	clientID: FACEBOOK_APP_ID,
+	// 	clientSecret: FACEBOOK_APP_SECRET,
+	//     callbackURL: siteurl+"/auth/facebook/callback"
+	//   },
+	//   function(accessToken, refreshToken, profile, done) {
+	//     process.nextTick(function () {
+	//       return done(null, profile);
+	//     });
+	//   }
+	// ));
 
 }
 
