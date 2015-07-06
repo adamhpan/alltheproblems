@@ -223,3 +223,9 @@ body{
 	position: absolute; 
 	top: 0;
 }
+
+.whitebase{
+	background-color: white;
+	border-radius: 4px;
+	padding: 15px;
+}

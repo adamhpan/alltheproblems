@@ -4,7 +4,7 @@
 		<div class="container">
 			<!-- Brand and mobile toggle -->
 			<div class="navbar-header">
-				<a href="<%= siteurl%>">
+				<a href="<%= siteurl%>/">
 					<img id="logo" src="<%= siteurl%>/public/images/logo.jpg" alt="Logo">
 				</a>
 				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
@@ -16,6 +16,9 @@
 
 			<!-- Untoggled header information -->
 			<div class="collapse navbar-collapse" id="navbar-collapse">
+				<% 
+					if(typeof user == 'undefined'){
+				%>
 				<form action="<%= siteurl%>/search" method="get" class="navbar-form navbar-left" role="search">
 					<div class="form-group">
 						<i class="fa fa-search"></i>
@@ -27,7 +30,11 @@
 					<!-- <li><a href="<%= siteurl%>">Categories</a></li> -->
 					<!-- <li><a href="<%= siteurl%>">Archives</a></li> -->
 					<li><a href="<%= siteurl%>/contact-us">Contact Us</a></li>
+					<li><a href="<%= siteurl%>/login">Login</a></li>
 				</ul>
+				<% }else{ %>
+					<li><a href="<%= siteurl%>/login">Login</a></li>
+				<% } %>
 			</div>
 		</div>
 	</nav>
