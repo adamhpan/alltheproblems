@@ -168,6 +168,8 @@ module.exports = function(app, passport, siteurl){
 		console.log('dashboard call');
 		var qs = "SELECT * FROM posts WHERE post_author = " + req.user.id;
 		connection.query(qs, function (err, rows){
+			if(err)
+				console.log(err);
 			if(!err){
 				res.render("dashboard", {siteurl:siteurl, user:req.user, message: req.flash('signupMessage')});
 			}
