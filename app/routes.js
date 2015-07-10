@@ -166,12 +166,15 @@ module.exports = function(app, passport, siteurl){
 	// =====================================
 	app.get("/dashboard", requireLogin, function (req, res, next){
 		console.log('dashboard call');
-		var qs = "SELECT * FROM posts WHERE post_author = " + req.user.id;
+		if(req.user.group_id == 1){
+
+		}
+		var qs = "SELECT * FROM posts";
 		connection.query(qs, function (err, rows){
 			if(err)
 				console.log(err);
 			if(!err){
-				res.render("dashboard", {siteurl:siteurl, user:req.user, message: req.flash('signupMessage')});
+				res.render("dashboard", {siteurl:siteurl, user:req.user, posts: rows});
 			}
 		});
 	});
@@ -196,6 +199,6 @@ module.exports = function(app, passport, siteurl){
 	function requireLogin(req, res, next) {
 	  	if (req.isAuthenticated())
 	  		return next();
-		res.redirect('/');
+		res.redirect('/login');
 	};
 }

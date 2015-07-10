@@ -2,10 +2,32 @@
 <% include ./header %>
 
 <div class="container">
-	<h1>You are authorized</h1>
+	<h1>Welcome <%= user.email %></h1>
 
-	<div>
-		
+	<div class="row">
+		<div class="col-md-12">
+			<h3>There are currently <%= posts.length %> posts on the site.</h3>
+			<table class="table">
+				<tr>
+					<th>Post ID</th>
+					<th>Content</th>
+					<th>Author</th>
+					<th>Post Date</th>
+					<th>Edit</th>
+				</tr>
+				<%
+					for( var i = 0; i < posts.length; i++ ){
+				%>
+					<td><%= posts[i].id%></td>
+					<td><%= posts[i].post_content%></td>
+					<td><%= posts[i].post_author%></td>
+					<td><%= posts[i].post_date%></td>
+					<td><a href="">Edit</a></td>
+				<%
+					}
+				%>
+			</table>
+		</div>
 	</div>
 </div>
 
