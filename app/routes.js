@@ -90,8 +90,7 @@ module.exports = function(app, passport, siteurl){
 	// =====================================
 	// Main posts page
 	app.get("/s/:postid", function (req, res){
-		var querystring = "SELECT * FROM post WHERE id = " + req.params.postid;
-		post_M.byDate(querystring).then(function (row){
+		post_M.byId(req.params.postid).then(function (row){
 			var metadata = {url:row[0].post_title, description:row[0].post_content};
 			res.render('single', {siteurl: siteurl, post: row[0], metaset:metadata});
 			return;
@@ -133,7 +132,7 @@ module.exports = function(app, passport, siteurl){
 
 	// Loading more posts
 	app.get("/loadmore", function (req,res){
-		var querystring = "SELECT * FROM post ORDER BY post_date LIMIT " + req.query.currentrow + ",15";
+		var querystring = "SELECT * FROM posts ORDER BY post_date LIMIT " + req.query.currentrow + ",15";
 		connection.query(querystring, function(err, rows){
 			if(!err){
 				if(typeof rows[0] == 'undefined'){
@@ -153,8 +152,8 @@ module.exports = function(app, passport, siteurl){
 
 	// updating a post's votes
 	app.post("/vote", function (req,res) {
-		var query = "UPDATE post SET post_vote"+req.body.votetype+" = post_vote"+req.body.votetype+" + 1 WHERE id ="+req.body.postid;
-		connection.query(query, function(err, rows){
+		var qs = "UPDATE post SET post_vote"+req.body.votetype+" = post_vote"+req.body.votetype+" + 1 WHERE id ="+req.body.postid;
+		connection.query(qs, function(err, rows){
 			if(!err){
 				res.json({status: "success"});
 			}
@@ -164,18 +163,30 @@ module.exports = function(app, passport, siteurl){
 	// =====================================
 	// USER DASHBOARD ======================
 	// =====================================
+	// dashboard view
 	app.get("/dashboard", requireLogin, function (req, res, next){
 		console.log('dashboard call');
 		if(req.user.group_id == 1){
 
 		}
-		var qs = "SELECT * FROM posts";
-		connection.query(qs, function (err, rows){
-			if(err)
-				console.log(err);
-			if(!err){
-				res.render("dashboard", {siteurl:siteurl, user:req.user, posts: rows});
-			}
+		post_M.byDate(1000).then(function (result){
+			console.log(result);
+			res.render("dashboard", {siteurl:siteurl, user:req.user, posts: result});
+		});
+	});
+
+	app.post('/save/quote', requireLogin, function (req, res){
+		limit = 1000;
+		Q.all([quote_M.save(req.body.quote, req.body.author), post_M.byDate(limit)]).then(function(result){
+			res.render('dashboard', {siteurl: siteurl, user:req.user, message: 'The quote has been added', posts:result[1]});
+		});
+	});
+
+	app.post('/save/post', requireLogin, function (req, res){
+		limit = 1000;
+		console.log(req.user);
+		Q.all([post_M.save(req.body.post, req.body.title, req.user.id), post_M.byDate(limit)]).then(function(result){
+			res.render('dashboard', {siteurl: siteurl, user:req.user, message: 'The post has been added', posts:result[1]});
 		});
 	});
 

@@ -9,16 +9,59 @@ var configDB = require('../config/database.js');
 var pool = mysql.createPool(configDB);
 
 
-function byDate(querystring){
+exports.save = function(post, title, userid){
 	var deferred = Q.defer();
 
+	pool.getConnection(function (err, connection){
+		if(err){
+			connection.release();
+			res.status(500).send('Connection Error');
+			return;
+		}
+
+		connection.query('INSERT INTO posts (post_content, post_title, post_author) VALUES (?,?,?)', [post, title, userid], function(err, result){
+			connection.release();
+			if(!err){
+				deferred.resolve(result);
+			}
+		});
+	});
+	return deferred.promise;
+}
+
+exports.byId = function (id){
+	var deferred = Q.defer();
+
+	qs = "SELECT * FROM posts WHERE id = " + id;
+	pool.getConnection(function(err, connection){
+		if(err){
+			throw err;
+			connection.release();
+			res.status(500).send('Initial get posts connection error');
+			return;
+		}
+		connection.query(qs, function(err, result){
+			connection.release();
+			if(!err){
+				deferred.resolve(result);
+			}
+		});
+	});
+	return deferred.promise;
+}
+
+function byDate(limit){
+	var deferred = Q.defer();
+
+	limit = typeof limit !== 'undefined' ? limit : 15;
+
 	querystring = typeof querystring !== 'undefined' ? 
-	querystring : "SELECT * FROM posts ORDER BY post_date LIMIT 15";
+	querystring : "SELECT posts.*, users.nickname FROM posts INNER JOIN users ON users.id = posts.post_author ORDER BY post_date LIMIT " + limit;
 
 	pool.getConnection(function(err, connection){
 		if(err){
 			throw err;
-			// connection.release();
+			connection.release();
 			res.status(500).send('Initial get posts connection error');
 			return;
 		}
